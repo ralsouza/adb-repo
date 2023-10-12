@@ -88,6 +88,10 @@ FROM users_dirty
 -- COMMAND ----------
 
 SELECT count_if(email IS NULL) FROM users_dirty;
+
+
+-- COMMAND ----------
+
 SELECT count(*) FROM users_dirty WHERE email IS NULL;
 
 -- COMMAND ----------
