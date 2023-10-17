@@ -102,11 +102,43 @@
 -- COMMAND ----------
 
 -- TODO
-CREATE OR REPLACE TEMP VIEW events_pivot
-<FILL_IN>
-("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
-"register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
-"cc_info", "foam", "reviews", "original", "delivery", "premium")
+-- Reference: https://docs.databricks.com/en/_extras/notebooks/source/pivot-in-sql.html
+
+CREATE OR REPLACE TEMP VIEW events_pivot AS
+SELECT * FROM (
+    select 
+        user_id as `user`
+        ,event_name 
+    from 
+        events
+)
+PIVOT (
+    count(*) FOR event_name IN ( -- <--- Use count(*) into PIVOT clause to consider user collumn too. Otherwise the column user won't show up.
+        "cart", 
+        "pillows", 
+        "login", 
+        "main", 
+        "careers", 
+        "guest", 
+        "faq", 
+        "down", 
+        "warranty", 
+        "finalize", 
+        "register", 
+        "shipping_info", 
+        "checkout", 
+        "mattresses", 
+        "add_item", 
+        "press", 
+        "email_coupon", 
+        "cc_info", 
+        "foam", 
+        "reviews", 
+        "original", 
+        "delivery", 
+        "premium"
+    )
+)
 
 -- COMMAND ----------
 
@@ -118,10 +150,26 @@ CREATE OR REPLACE TEMP VIEW events_pivot
 -- COMMAND ----------
 
 -- MAGIC %python
+-- MAGIC from pyspark.sql.functions import expr, col
+-- MAGIC
 -- MAGIC # TODO
 -- MAGIC (spark.read
--- MAGIC     <FILL_IN>
--- MAGIC     .createOrReplaceTempView("events_pivot"))
+-- MAGIC     .table("events")
+-- MAGIC     .groupBy(col("user_id").alias("user"))
+-- MAGIC     .pivot("event_name")
+-- MAGIC     .count()
+-- MAGIC     .createOrReplaceTempView("events_pivot")
+-- MAGIC )
+-- MAGIC
+-- MAGIC
+-- MAGIC # ANSWER
+-- MAGIC # (spark.read.table("events")
+-- MAGIC #     .groupBy("user_id")
+-- MAGIC #     .pivot("event_name")
+-- MAGIC #     .count()
+-- MAGIC #     .withColumnRenamed("user_id", "user")
+-- MAGIC #     .createOrReplaceTempView("events_pivot"))
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -182,7 +230,10 @@ CREATE OR REPLACE TEMP VIEW events_pivot
 
 -- TODO
 CREATE OR REPLACE TEMP VIEW clickpaths AS
-<FILL_IN>
+SELECT * 
+FROM events_pivot a
+JOIN transactions b 
+  ON a.user = b.user_id
 
 -- COMMAND ----------
 
@@ -195,9 +246,12 @@ CREATE OR REPLACE TEMP VIEW clickpaths AS
 
 -- MAGIC %python
 -- MAGIC # TODO
--- MAGIC (spark.read
--- MAGIC     <FILL_IN>
--- MAGIC     .createOrReplaceTempView("clickpaths"))
+-- MAGIC from pyspark.sql.functions import col
+-- MAGIC (
+-- MAGIC     spark.read.table("events_pivot")
+-- MAGIC     .join(spark.table("transactions"), col("events_pivot.user") == col("transactions.user_id"), "inner")
+-- MAGIC     .createOrReplaceTempView("clickpaths")
+-- MAGIC )
 
 -- COMMAND ----------
 
