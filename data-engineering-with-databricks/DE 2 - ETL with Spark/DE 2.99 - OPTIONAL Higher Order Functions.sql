@@ -118,7 +118,7 @@ CREATE OR REPLACE TABLE sales_product_flags AS
 SELECT items,
 EXISTS (items, x -> x.item_name LIKE "%Mattress") as mattress,
 EXISTS (items, x -> x.item_name LIKE "%Pillow") as pillow
-from sales
+FROM sales
 
 -- COMMAND ----------
 
