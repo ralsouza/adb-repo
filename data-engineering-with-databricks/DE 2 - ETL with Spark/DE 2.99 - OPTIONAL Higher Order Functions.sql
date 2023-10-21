@@ -115,9 +115,14 @@ FROM sales
 
 -- TODO
 CREATE OR REPLACE TABLE sales_product_flags AS
-<FILL_IN>
-EXISTS <FILL_IN>.item_name LIKE "%Mattress"
-EXISTS <FILL_IN>.item_name LIKE "%Pillow"
+SELECT items,
+EXISTS (items, x -> x.item_name LIKE "%Mattress") as mattress,
+EXISTS (items, x -> x.item_name LIKE "%Pillow") as pillow
+from sales
+
+-- COMMAND ----------
+
+select * from sales_product_flags
 
 -- COMMAND ----------
 
