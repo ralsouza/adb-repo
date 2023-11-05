@@ -55,6 +55,13 @@
 
 -- COMMAND ----------
 
+-- MAGIC %python
+-- MAGIC # List directories in DBFS
+-- MAGIC dbutils.fs.ls("dbfs:/mnt/dbacademy-datasets/data-engineer-learning-path/v02/ecommerce/raw/sales-historical/")
+-- MAGIC
+
+-- COMMAND ----------
+
 CREATE OR REPLACE TABLE sales AS
 SELECT * FROM parquet.`${DA.paths.datasets}/ecommerce/raw/sales-historical`;
 
@@ -174,6 +181,10 @@ CREATE OR REPLACE TABLE purchase_dates (
 
 -- COMMAND ----------
 
+select * from purchase_dates
+
+-- COMMAND ----------
+
 -- DBTITLE 0,--i18n-33e94ae0-f443-4cc9-9691-30b8b08179aa
 -- MAGIC %md
 -- MAGIC
@@ -220,8 +231,17 @@ SELECT * FROM purchase_dates
 
 -- COMMAND ----------
 
+-- It will fail, because the generated column is automatically computed 
 -- INSERT INTO purchase_dates VALUES
--- (1, 600000000, 42.0, "2020-06-18")
+-- (1, 600000000, 42.0, "2020-06-15")
+
+-- It will fail, because the generated column is automatically computed 
+-- INSERT INTO purchase_dates (id, transaction_timestamp, price, date) VALUES
+-- (1, 600000000, 42.0, "2020-06-15")
+
+-- This will work properly, note the column names declaration
+INSERT INTO purchase_dates (id, transaction_timestamp, price) VALUES
+(1, 600000000, 42.0)
 
 -- COMMAND ----------
 
